@@ -1,6 +1,7 @@
 (import test ())
 
 (defun double (x) (* x 2))
+(defun add (a b) (+ a b))
 
 (describe "A function"
   [may "be composed"
@@ -46,6 +47,20 @@
         (affirm (= 2 (fn 1))
                 (= 2 (fn 1))
                 (= 2 (fn 1)))))]
+  [may "be curried"
+    (will "be a function"
+      (affirm (= "function" (type (curry add 1)))))
+    (will "work"
+      (affirm (= 2 ((curry add 1) 1))
+              (= 3 ((curry add 2) 1))))]
+  [may "be autocurried"
+    (will "be a new function"
+      (let [(sum (autocurry add 2))]
+        (affirm (= "function" (type sum)))
+        (will "still be a function on first arg supplied"
+          (affirm (= "function" (type (sum 1)))))
+        (will "apply args on final arity"
+          (affirm (= 3 ((sum 1) 2))))))]
   [may "be chained"
     (will "work with functions"
           (affirm (= 5 (-> 2 (lambda (x) (* 2 x)) succ))

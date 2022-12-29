@@ -178,3 +178,24 @@
    out = 1
    ```"
   (apply (.> x key) x args))
+
+
+(defun curry (f &args)
+  "Partially apply a function F with predetermined first args
+   ### Example
+   ```cl
+   > (define add1 (curry + 1))
+   > (add1 3)
+   out = 4
+   ```"
+  (lambda (&next-args)
+    (apply f (append args next-args))))
+
+(defun autocurry (f arity)
+  (lambda (&args)
+    (with [len (n args)]
+      (if (>= len arity)
+        (apply f args)
+        (autocurry
+          (apply (cut curry f <>) args)
+          (- arity len))))))
